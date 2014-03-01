@@ -6,15 +6,15 @@ ERRORS_BUFFER=""
 
 ROOT_DIR=$(git rev-parse --show-toplevel)
 BLACKLIST=$ROOT_DIR/.precommitblacklist
-LIST=$(git status | grep -e '\#.*\(modified\|added\)')
+LIST=$(git status | grep -e '\#.*\(modified\|added\)' | grep -v precommitblacklist)
 for FILEPATH in $LIST
 do
-    if [ "$file" == '#' ]; then
+    if [ "$FILEPATH" == '#' ]; then
         continue
     fi
-    if [ $(echo "$file" | grep 'modified') ]; then
+    if [ $(echo "$FILEPATH" | grep 'modified') ]; then
         FILE_ACTION="modified"
-    elif [ $(echo "$file" | grep 'added') ]; then
+    elif [ $(echo "$FILEPATH" | grep 'added') ]; then
         FILE_ACTION="added"
     else 
         # if there's no extension, this returns the full filename
@@ -25,13 +25,13 @@ do
             BASE=".$EXTENSION"
             EXTENSION=""
         fi
-        if [ "$EXTENSION" != "$file" ]; then
+        if [ "$EXTENSION" != "$FILEPATH" ]; then
             BLACKLIST_FILE=$BLACKLIST.$EXTENSION
             if [ -f $BLACKLIST_FILE ]; then
                 while IFS= read -r CHECK
                 do
                     if [ "$CHECK" != "" ]; then
-                        echo "Checking for '$CHECK' in $FILE_ACTION file: $FILENAME" 
+                        #echo "Checking for '$CHECK' in $FILE_ACTION file: $FILENAME" 
                         ERRORS=$(grep "${CHECK}" $FILEPATH >&1)
                         if [ "$ERRORS" != "" ]; then
                             if [ "$ERRORS_BUFFER" != "" ]; then
