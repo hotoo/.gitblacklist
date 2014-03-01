@@ -7,7 +7,14 @@ GIT - Pre-Commit check for certain words
 About
 -----
 GIT pre-commit hook for checking the existence of certain words/phrases/functions 
-in the code to be committed. 
+in the code to be committed. These phrases are taken from external files, based on
+the extension of the file being checked.
+
+Example: to check for "TODO" or "FIXME" in a java file, create the file
+  {git root}/.precommitblacklist.java
+containing the two lines:
+TODO
+FIXME
 
 How to install
 --------------
@@ -16,9 +23,7 @@ To install hook, copy pre-commit file to your project .git/hooks/pre-commit:
     $ cp pre-commit .git/hooks/pre-commit;
     $ chmod +x .git/hooks/pre-commit;
 
-The hook comes with the "die", "print_r" and "var_dump" functions as the strings to 
-be checked prior to the commit. You can add more strings to be checked if you wish 
-by modifying the checks array
+The hook comes with no ".precommitblacklist.EXTENSION" files.
 
 Bugs
 ----
