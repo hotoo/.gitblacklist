@@ -1,22 +1,17 @@
 #!/bin/bash
-# Author: Nikolaos Dimopoulos
-# Based on code by Remigijus Jarmalavičius
 
 ERRORS_BUFFER=""
 
 ROOT_DIR=$(git rev-parse --show-toplevel)
 BLACKLIST=$ROOT_DIR/.precommitblacklist
-LIST=$(git status | grep -e '\#.*\(modified\|added\)' | grep -v precommitblacklist)
+LIST=$(git status --porcelain | grep -e '^\s*\(M\|A\)' | grep -v precommitblacklist)
 for FILEPATH in $LIST
 do
-    if [ "$FILEPATH" == '#' ]; then
-        continue
-    fi
-    if [ $(echo "$FILEPATH" | grep 'modified') ]; then
+    if [ $(echo "$FILEPATH" | grep '^\s*M\s\+') ]; then
         FILE_ACTION="modified"
-    elif [ $(echo "$FILEPATH" | grep 'added') ]; then
+    elif [ $(echo "$FILEPATH" | grep '^\s*A\s\+') ]; then
         FILE_ACTION="added"
-    else 
+    else
         # if there's no extension, this returns the full filename
         FILENAME="${FILEPATH##*/}"
         BASE="${FILENAME%.[^.]*}"
@@ -31,7 +26,7 @@ do
                 while IFS= read -r CHECK
                 do
                     if [ "$CHECK" != "" ]; then
-                        #echo "Checking for '$CHECK' in $FILE_ACTION file: $FILENAME" 
+                        #echo "Checking for '$CHECK' in $FILE_ACTION file: $FILENAME"
                         ERRORS=$(grep "${CHECK}" $FILEPATH >&1)
                         if [ "$ERRORS" != "" ]; then
                             if [ "$ERRORS_BUFFER" != "" ]; then
@@ -49,10 +44,10 @@ do
 done
 
 if [ "$ERRORS_BUFFER" != "" ]; then
-    echo 
+    echo
     echo "These errors were found in staged files: "
     echo -e $ERRORS_BUFFER
-    echo 
+    echo
     echo "Can't commit, fix errors first."
     exit 1
 else
