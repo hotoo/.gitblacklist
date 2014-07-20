@@ -1,15 +1,49 @@
 #!/bin/bash
 
-ERRORS_BUFFER=""
+FOUND_ERROR="FALSE"
 
 ROOT_DIR=$(git rev-parse --show-toplevel)
 BLACKLIST=$ROOT_DIR/.precommitblacklist
 LIST=$(git status --porcelain | grep -e '^\s*\(M\|A\)' | grep -v precommitblacklist)
+
+LAST_FILENAME=""
+
+function checkBlackList(){
+    blacklist_file=$1
+    filepath=$2
+    filename=$3
+
+    if [ -f $blacklist_file ]; then
+        while IFS= read -r CHECK
+        do
+            if [ "$CHECK" != "" ]; then
+
+                #echo "Checking for '$CHECK' in $FILE_ACTION file: $filename"
+                ERRORS=$(grep -in --color "${CHECK}" $filepath >&1)
+
+                if [ "$FOUND_ERROR" = "FALSE" ]; then
+                    FOUND_ERROR="TRUE"
+                    echo "These errors were found in staged files:"
+                fi
+
+                if [ "$ERRORS" != "" ]; then
+
+                    if [ "$filename" != "$LAST_FILENAME" ]; then
+                        LAST_FILENAME="$filename"
+                        echo "$filename:"
+                    fi
+                    echo "    $ERRORS"
+                fi
+            fi
+        done < $blacklist_file
+    fi
+}
+
 for FILEPATH in $LIST
 do
-    if [ $(echo "$FILEPATH" | grep '^\s*M\s\+') ]; then
+    if [ $(echo "$FILEPATH" | grep 'M') ]; then
         FILE_ACTION="modified"
-    elif [ $(echo "$FILEPATH" | grep '^\s*A\s\+') ]; then
+    elif [ $(echo "$FILEPATH" | grep 'A') ]; then
         FILE_ACTION="added"
     else
         # if there's no extension, this returns the full filename
@@ -20,36 +54,18 @@ do
             BASE=".$EXTENSION"
             EXTENSION=""
         fi
+
+        checkBlackList $BLACKLIST $FILEPATH $FILENAME
+
         if [ "$EXTENSION" != "$FILEPATH" ]; then
-            BLACKLIST_FILE=$BLACKLIST.$EXTENSION
-            if [ -f $BLACKLIST_FILE ]; then
-                while IFS= read -r CHECK
-                do
-                    if [ "$CHECK" != "" ]; then
-                        #echo "Checking for '$CHECK' in $FILE_ACTION file: $FILENAME"
-                        ERRORS=$(grep "${CHECK}" $FILEPATH >&1)
-                        if [ "$ERRORS" != "" ]; then
-                            if [ "$ERRORS_BUFFER" != "" ]; then
-                                ERRORS_BUFFER="$ERRORS_BUFFER\n$ERRORS"
-                            else
-                                ERRORS_BUFFER="$ERRORS"
-                            fi
-                            echo "${CHECK} found in file: $FILENAME"
-                        fi
-                    fi
-                done < $BLACKLIST_FILE
-            fi
+            BLACKLIST_FILE_EXTENSION=$BLACKLIST.$EXTENSION
+            checkBlackList $BLACKLIST_FILE_EXTENSION $FILEPATH $FILENAME
         fi
     fi
 done
 
-if [ "$ERRORS_BUFFER" != "" ]; then
+if [ "$FOUND_ERROR" = "TRUE" ]; then
     echo
-    echo "These errors were found in staged files: "
-    echo -e $ERRORS_BUFFER
-    echo
-    echo "Can't commit, fix errors first."
+    echo "Commit rejected, fix errors first."
     exit 1
-else
-    echo "Commited successfully."
 fi
