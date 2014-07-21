@@ -22,12 +22,12 @@ function checkBlackList(){
                 #echo "Checking for '$CHECK' in $FILE_ACTION file: $filename"
                 ERRORS=$(grep -in --color "${CHECK}" $filepath >&1)
 
-                if [ "$FOUND_ERROR" = "FALSE" ]; then
-                    FOUND_ERROR="TRUE"
-                    echo "These errors were found in staged files:"
-                fi
-
                 if [ "$ERRORS" != "" ]; then
+
+                    if [ "$FOUND_ERROR" = "FALSE" ]; then
+                        FOUND_ERROR="TRUE"
+                        echo "These errors were found in staged files:"
+                    fi
 
                     if [ "$filename" != "$LAST_FILENAME" ]; then
                         LAST_FILENAME="$filename"
@@ -39,6 +39,7 @@ function checkBlackList(){
         done < $blacklist_file
     fi
 }
+
 
 for FILEPATH in $LIST
 do
