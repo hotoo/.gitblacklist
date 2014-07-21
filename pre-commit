@@ -3,8 +3,9 @@
 FOUND_ERROR="FALSE"
 
 ROOT_DIR=$(git rev-parse --show-toplevel)
-BLACKLIST=$ROOT_DIR/.precommitblacklist
-LIST=$(git status --porcelain | grep -e '^\s*\(M\|A\)' | grep -v precommitblacklist)
+USER_BLACKLIST=~/.gitblacklist
+BLACKLIST=$ROOT_DIR/.gitblacklist
+LIST=$(git status --porcelain | grep -e '^\s*\(M\|A\)' | grep -v gitblacklist)
 
 LAST_FILENAME=""
 
@@ -55,11 +56,15 @@ do
             EXTENSION=""
         fi
 
+        checkBlackList $USER_BLACKLIST $FILEPATH $FILENAME
+
         checkBlackList $BLACKLIST $FILEPATH $FILENAME
 
         if [ "$EXTENSION" != "$FILEPATH" ]; then
             BLACKLIST_FILE_EXTENSION=$BLACKLIST.$EXTENSION
+            USER_BLACKLIST_EXTENSION=$USER_BLACKLIST.$EXTENSION
             checkBlackList $BLACKLIST_FILE_EXTENSION $FILEPATH $FILENAME
+            checkBlackList $USER_BLACKLIST_EXTENSION $FILEPATH $FILENAME
         fi
     fi
 done
