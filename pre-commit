@@ -5,7 +5,7 @@ FOUND_ERROR="FALSE"
 ROOT_DIR=$(git rev-parse --show-toplevel)
 USER_BLACKLIST=~/.gitblacklist
 BLACKLIST=$ROOT_DIR/.gitblacklist
-LIST=$(git status --porcelain | grep -e '^\s*\(M\|A\)' | grep -v gitblacklist)
+LIST=$(git status --porcelain | grep -e '^\s*\([ MARC]M\|A[ MD]\)\s\+' | grep -v gitblacklist)
 
 LAST_FILENAME=""
 
@@ -42,9 +42,9 @@ function checkBlackList(){
 
 for FILEPATH in $LIST
 do
-    if [ $(echo "$FILEPATH" | grep 'M') ]; then
+    if [ $(echo "$FILEPATH" | grep '^[ MARC]\?M$') ]; then
         FILE_ACTION="modified"
-    elif [ $(echo "$FILEPATH" | grep 'A') ]; then
+    elif [ $(echo "$FILEPATH" | grep '^A[ MD]\?$') ]; then
         FILE_ACTION="added"
     else
         # if there's no extension, this returns the full filename
