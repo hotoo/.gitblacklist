@@ -9,12 +9,14 @@ commit into git repository.
 
 ## Install
 
+```bash
+$ npm install gitblacklist -g
 ```
-$ git clone https://github.com/hotoo/.gitblacklist.git ~/.gitblacklist
-$
-$ cd my-repo
-$ cp ~/.gitblacklist/pre-commit .git/hooks/pre-commit;
-$ chmod +x .git/hooks/pre-commit;
+
+## Usage
+
+```
+$ gitblacklist init
 ```
 
 ## Configuration

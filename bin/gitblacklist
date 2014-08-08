@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+var commander = require('commander');
+var exeq = require("exeq");
+
+var CWD = process.cwd();
+var dir = __dirname;
+
+commander.
+  version(require('../package').version).
+  usage('[options]').
+  option('init', 'init gitblacklist pre-commit hooks for current git repository.').
+  parse(process.argv);
+
+
+if (commander.init) {
+  exeq(['cp ' + dir + "/../pre-commit " + CWD + "/.git/hooks/"]);
+}
+
+// vim:ft=javascript

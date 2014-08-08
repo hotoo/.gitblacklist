@@ -1,0 +1,26 @@
+{
+  "name": "gitblacklist",
+  "version": "0.1.0",
+  "description": "Git blacklist",
+  "bin": {
+    "gitblacklist": "./bin/gitblacklist"
+  },
+  "dependencies": {
+    "commander": "~1.1.1",
+    "exeq": "1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hotoo/.gitblacklist.git"
+  },
+  "keywords": [
+    "Git",
+    "BlackList"
+  ],
+  "author": "闲耘<hotoo.cn@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hotoo/.gitblacklist/issues"
+  },
+  "homepage": "https://github.com/hotoo/.gitblacklist"
+}
